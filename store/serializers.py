@@ -7,9 +7,9 @@ class CollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ['id', 'title', 'products_count']
 
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only = True)
     title = serializers.CharField(max_length = 255)
-    products_count = serializers.IntegerField()
+    products_count = serializers.IntegerField(read_only = True)
 
 class ProductSerializer(serializers.ModelSerializer):
     '''
