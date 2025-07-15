@@ -5,10 +5,11 @@ from .models import Product, Collection
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'products_count']
 
     id = serializers.IntegerField()
     title = serializers.CharField(max_length = 255)
+    products_count = serializers.IntegerField()
 
 class ProductSerializer(serializers.ModelSerializer):
     '''
