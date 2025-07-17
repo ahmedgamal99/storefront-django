@@ -11,6 +11,7 @@ from .models import Product, Collection, OrderItem, Review, Cart, CartItem, Cust
 from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, CustomerSerializer
 from .filters import ProductFilter
 from .pagination import DefaultPagination
+from pprint import pprint
 # Create your views here.
 
 class ProductViewSet(ModelViewSet):
@@ -77,9 +78,20 @@ class CustomerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, Ge
     serializer_class = CustomerSerializer
 
     # Available on the list when you set detail to False
-    @action(detail=False)
+    @action(detail=False, methods = ['GET', 'PUT'])
     def me(self, request):
-        return Response("ok")
+        
+        #return Response(request.user.id)
+        # pprint(request.user)
+        (customer, created) = Customer.objects.get_or_create(user_id = request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, data = request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
 
 '''
 @api_view(['GET', 'POST'])
