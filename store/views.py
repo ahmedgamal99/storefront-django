@@ -8,8 +8,8 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser, DjangoModelPermissions
-from .models import Product, Collection, OrderItem, Review, Cart, CartItem, Customer
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, CustomerSerializer
+from .models import Product, Collection, OrderItem, Review, Cart, CartItem, Customer, Order
+from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer, UpdateCartItemSerializer, CustomerSerializer, OrderSerializer
 from .filters import ProductFilter
 from .pagination import DefaultPagination
 from .permissions import IsAdminOrReadOnly, ViewCustomerHistoryPermission
@@ -98,6 +98,20 @@ class CustomerViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+class OrderViewSet(ModelViewSet):
+    # queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.all()
+        
+        (customer_id,created) = Customer.object.only('id').get_or_create(user_id = user.id)
+        return Order.objects.filter(customer_id=customer_id)
+
 
 '''
 @api_view(['GET', 'POST'])
